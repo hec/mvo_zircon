@@ -24,7 +24,6 @@ public class ServerDocument {
 	public Document getMetadataDocument(String urlDocument) {
 	  Document doc = null;
   	try {
-		System.out.println("url = "+urlDocument);
 			URL url = new URL(urlDocument);
 			DocumentBuilder parser = DocumentBuilderFactory.newInstance()
 					.newDocumentBuilder();
