@@ -20,4 +20,8 @@ public class CoreDocumentModel {
 	public void addRecord(Record rec) {
 		this.list.put(rec.getId(), rec);
 	}
+	
+	public Record getRecord(String key) {
+		return this.list.get(key);
+	}
 }

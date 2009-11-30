@@ -62,6 +62,7 @@ public class Client extends HttpServlet {
   								   HttpServletRequest.class, HttpServletResponse.class });
 			Object[] parameters = new Object[] { req, resp };
 			Object res = m.invoke(c.newInstance(), parameters);
+			resp.setContentType("application/json");
 			PrintWriter writer = resp.getWriter();
 			writer.print(res.toString());
 			writer.flush();

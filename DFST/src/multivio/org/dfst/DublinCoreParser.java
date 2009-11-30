@@ -31,6 +31,10 @@ public class DublinCoreParser implements ParserInterface {
 			recordId = "n000" + Integer.toString(localId);
 		else if(99 < localId && localId < 1000)
 			recordId = "n00" + Integer.toString(localId);
+		else if (999 < localId && localId < 10000)
+			recordId = "n0" + Integer.toString(localId);
+		else if (9999 < localId && localId < 100000)
+			recordId = "n" + Integer.toString(localId);
 		else
 			recordId = "undefined";
 		return recordId;

@@ -16,7 +16,7 @@ public class Record {
 	private String label;
 	private HashMap<String, Object> meta;
 	private int sequenceNumber;
-	private String defaultUrl;
+	private String defaultUrl = "";
 
 	public Record(String id) {
 		this.id = id;
@@ -96,7 +96,13 @@ public class Record {
 	public String getRecordToString() {
 		StringBuffer st = new StringBuffer();
 		st.append("\"guid\": \"" + this.getId() + "\", ");
-		st.append("\"parentId\": [\"" + this.parentId.get(0) + "\"], ");
+		st.append("\"parentId\": [");
+		for (int i = 0; i < parentId.size(); i++) {
+			st.append("\"" + parentId.get(i) + "\" ");
+			if (i != parentId.size() - 1)
+				st.append(", ");
+		}
+		st.append("], ");		
 		st.append("\"nextId\": \"" + this.nextId + "\", ");
 		st.append("\"previousId\": \"" + this.previousId + "\", ");
 		if (this.children.size() != 0) {

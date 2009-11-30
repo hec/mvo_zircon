@@ -21,29 +21,42 @@ import org.w3c.dom.Document;
  * 
  */
 public class StructureParser {
+	
+	private ParserInterface parser;
 
-	public StructureParser() {
-
-	}
+	public StructureParser() {}
 	
 	public String getDoc (HttpServletRequest request, HttpServletResponse response) throws IOException {
-	  String res = "do get";
-	  String fileNumber = request.getParameter("recid");
+		String res = "do get";
+		String fileNumber = request.getParameter("recid");
+		
 		if(fileNumber != null){
 			System.out.println("value of the request " + fileNumber);
 			ServerDocument serv = new ServerDocument();
-			Document doc = serv.getMetadataDocument("http://doc.rero.ch/record/" + fileNumber + "/export/xd?");
+			if (fileNumber.indexOf("PPN") != -1) {
+				fileNumber = "http://gdz.sub.uni-goettingen.de/mets_export.php?PPN="+fileNumber;
+			}
+			else {
+				fileNumber = "http://doc.rero.ch/record/" + fileNumber + "/export/xd?";
+			}
+			Document doc = serv.getMetadataDocument(fileNumber);
 			res = this.selectStrategy(doc);
 		}
-	return res;
+		return res;
 	}
 
 
 	public String selectStrategy(Document doc) {
 		// to do choose the rigth parser
-		// today only dublinCore
-		DublinCoreParser par = new DublinCoreParser();
-		CoreDocumentModel cdm = par.parseDocument(doc);
+		// today only dublinCore or Mets
+		if (doc.getDocumentElement().getNodeName().indexOf("mets") != -1) {
+			System.out.println("mets parser selected");
+			this.parser = new MetsDFGParser();
+		}
+		else {
+			this.parser = new DublinCoreParser();
+		}
+		CoreDocumentModel cdm = this.parser.parseDocument(doc);
 		String res = writeCDM(cdm);
 		return res;
 	}
