@@ -36,9 +36,15 @@ public class StructureParser {
 			if (fileNumber.indexOf("PPN") != -1) {
 				fileNumber = "http://gdz.sub.uni-goettingen.de/mets_export.php?PPN="+fileNumber;
 			}
+			else if (fileNumber.indexOf("oai") != -1){
+				fileNumber = fileNumber.substring(3);
+				System.out.println("f1 "+ fileNumber);
+				fileNumber = "http://era.ethz.ch/oai?verb=GetRecord&metadataPrefix=mets&identifier=oai:era.ethz.ch:"+fileNumber;
+			}
 			else {
 				fileNumber = "http://doc.rero.ch/record/" + fileNumber + "/export/xd?";
 			}
+							System.out.println("f2 "+fileNumber);
 			Document doc = serv.getMetadataDocument(fileNumber);
 			res = this.selectStrategy(doc);
 		}
@@ -51,6 +57,10 @@ public class StructureParser {
 		// today only dublinCore or Mets
 		if (doc.getDocumentElement().getNodeName().indexOf("mets") != -1) {
 			System.out.println("mets parser selected");
+			this.parser = new MetsDFGParser();
+		}
+		else if (doc.getDocumentElement().getNodeName().indexOf("OAI") != -1) {
+			System.out.println("mets with oai parser selected");
 			this.parser = new MetsDFGParser();
 		}
 		else {

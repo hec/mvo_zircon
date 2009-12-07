@@ -250,21 +250,46 @@ public class MetsDFGParser implements ParserInterface {
 					LinkedList<String> childrenLogicalId = new LinkedList<String>();
 					NodeList childrenNode = oneChild.getChildNodes();
 					for (int k = 0; k < childrenNode.getLength(); k++) {
-						childrenLogicalId.add(childrenNode.item(k).getAttributes().getNamedItem("ID").getNodeValue());
+						Node tempId = childrenNode.item(k).getAttributes().getNamedItem("ID");
+						if(tempId != null) {
+							childrenLogicalId.add(tempId.getNodeValue());
+						}
 					}
 					//LinkedList<String> resultIds = getParentFileId(parentLogicalId, childrenLogicalId);
-					LinkedList<String> temp = parentFiles(parentLogicalId, childrenLogicalId);
-					if(!temp.isEmpty()){
-						System.out.println("label has leaf files and labels");
-						for(int n = 0; n < temp.size(); n++){
-							String leafId = createLeaf(oneRecord,temp.get(n));
+					if (childrenLogicalId.size() != 0) {
+						LinkedList<String> temp = parentFiles(parentLogicalId, childrenLogicalId);
+						if(!temp.isEmpty()){
+							System.out.println("label has leaf files and labels");
+							for(int n = 0; n < temp.size(); n++){
+								String leafId = createLeaf(oneRecord,temp.get(n));
+								if (leafId != null){
+									childs.add(leafId);
+								}
+							}
+						}
+						createStructure(oneRecord, oneChild);
+						childs.addAll(oneRecord.getChildren());
+					}
+					else {
+						System.out.println("only leaf children");
+						String logicalId = oneChild.getAttributes().getNamedItem("ID").getNodeValue();
+						LinkedList<String>listOfFilesId = new LinkedList<String>();
+						NodeList smLinks = this.links.getChildNodes();
+						for (int l = 0; l < smLinks.getLength(); l++) {
+							Node oneSmLink = smLinks.item(l);
+							if (oneSmLink.getAttributes().getNamedItem("xlink:from")
+								.getNodeValue().equals(logicalId)) {
+								listOfFilesId.add(oneSmLink.getAttributes()
+									.getNamedItem("xlink:to").getNodeValue());
+							}
+						}					
+						for (int j = 0; j <listOfFilesId.size(); j++) {
+							String leafId = createLeaf(oneRecord,listOfFilesId.get(j));
 							if (leafId != null){
 								childs.add(leafId);
 							}
 						}
 					}
-					createStructure(oneRecord, oneChild);
-					childs.addAll(oneRecord.getChildren());
 				}
 				else {
 					System.out.println("only leaf children");
@@ -279,7 +304,6 @@ public class MetsDFGParser implements ParserInterface {
 								.getNamedItem("xlink:to").getNodeValue());
 						}
 					}
-					
 					for (int j = 0; j <listOfFilesId.size(); j++) {
 						String leafId = createLeaf(oneRecord,listOfFilesId.get(j));
 						if (leafId != null){
@@ -322,17 +346,19 @@ public class MetsDFGParser implements ParserInterface {
 		boolean alreadyExist = false;
 		for (int t = 0; t < divs.getLength(); t++) {
 			Node div = divs.item(t);
-			if (div.getAttributes().getNamedItem("ID").getNodeValue().equals(physicalId)) {
-				order = (Integer.parseInt(div.getAttributes().getNamedItem("ORDER").getNodeValue()));
-				for (int j = 0; j < div.getChildNodes().getLength(); j++) {
-					Node oneChild = div.getChildNodes().item(j);
-					String tempId = oneChild.getAttributes().getNamedItem("FILEID").getNodeValue();
-					if (this.filesId.contains(tempId)) {
-						fileId = tempId;
-						break;
+			if(div.getAttributes().getNamedItem("ID") != null) {
+				if (div.getAttributes().getNamedItem("ID").getNodeValue().equals(physicalId)) {
+					order = (Integer.parseInt(div.getAttributes().getNamedItem("ORDER").getNodeValue()));
+					for (int j = 0; j < div.getChildNodes().getLength(); j++) {
+						Node oneChild = div.getChildNodes().item(j);
+						String tempId = oneChild.getAttributes().getNamedItem("FILEID").getNodeValue();
+						if (this.filesId.contains(tempId)) {
+							fileId = tempId;
+							break;
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
 		// no files => stop here

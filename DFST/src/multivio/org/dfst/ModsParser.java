@@ -68,20 +68,22 @@ public class ModsParser implements ParserInterface {
 
 		descriptiveMetadata.put("title", doc.getElementsByTagName(this.modsWriting+"title")
 				.item(0).getFirstChild().getTextContent());
-		descriptiveMetadata.put("language", doc.getElementsByTagName(
+		if(doc.getElementsByTagName(this.modsWriting+"languageTerm").getLength() != 0) {
+			descriptiveMetadata.put("language", doc.getElementsByTagName(
 				this.modsWriting+"languageTerm").item(0).getTextContent());
+		}
 		NodeList auts = doc.getElementsByTagName(this.modsWriting+"name");
 		for (int i = 0; i < auts.getLength(); i++) {
 			Node name = auts.item(i);
 			NodeList childs = name.getChildNodes();
-			String key = "";
+			String key = "creator";
 			String value = "";
 			for (int j = 0; j < childs.getLength(); j++) {
 				Node temp = childs.item(j);
-				if (temp.getNodeName().equals(this.modsWriting+"role")) {
+				/*if (temp.getNodeName().equals(this.modsWriting+"role")) {
 					// key = temp.getFirstChild().getTextContent();
 					key = "creator";
-				}
+				}*/
 				if (temp.getNodeName().equals(this.modsWriting+"namePart")) {
 					value += " " + temp.getFirstChild().getTextContent();
 				}
